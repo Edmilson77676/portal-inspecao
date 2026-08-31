@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Inspeção de Equipamentos</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+background:#f5f6f8;
+color:#333;
+}
+
+.container{
+width:95%;
+max-width:1200px;
+margin:auto;
+}
+
+header{
+text-align:center;
+padding:30px 0;
+}
+
+.logo{
+font-size:42px;
+font-weight:bold;
+color:#8b1023;
+margin-bottom:10px;
+}
+
+header h1{
+font-size:34px;
+margin-bottom:5px;
+}
+
+header p{
+color:#777;
+}
+
+.top-buttons{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-top:20px;
+flex-wrap:wrap;
+}
+
+button{
+background:#981b31;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+transition:.3s;
+}
+
+button:hover{
+background:#7d1327;
+}
+
+.card-section{
+background:white;
+padding:30px;
+border-radius:15px;
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+margin-bottom:35px;
+}
+
+.subtitle{
+color:#981b31;
+font-weight:bold;
+font-size:12px;
+letter-spacing:2px;
+margin-bottom:10px;
+}
+
+.title{
+font-size:28px;
+font-weight:700;
+margin-bottom:5px;
+}
+
+.description{
+color:#777;
+margin-bottom:30px;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+.field{
+display:flex;
+flex-direction:column;
+}
+
+label{
+font-weight:600;
+margin-bottom:8px;
+}
+
+input,
+select,
+textarea{
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;
+font-size:14px;
+}
+
+textarea{
+height:120px;
+resize:none;
+}
+
+.full{
+grid-column:1 / -1;
+}
+
+.upload-box{
+border:2px dashed #d9d9d9;
+padding:40px;
+text-align:center;
+border-radius:10px;
+background:#fafafa;
+}
+
+#preview{
+width:200px;
+margin-top:15px;
+border-radius:10px;
+display:none;
+}
+
+.send-area{
+text-align:center;
+margin-top:25px;
+}
+
+.filters{
+display:grid;
+grid-template-columns:1fr 1fr auto auto;
+gap:10px;
+margin-bottom:20px;
+}
+
+.historico-card{
+border:1px solid #eee;
+border-radius:12px;
+padding:20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
+background:white;
+}
+
+.card-info{
+display:flex;
+gap:20px;
+align-items:center;
+}
+
+.thumb{
+width:80px;
+height:80px;
+object-fit:cover;
+border-radius:10px;
+background:#eee;
+}
+
+.card-title{
+font-size:20px;
+font-weight:bold;
+}
+
+.criticidade{
+padding:5px 10px;
+border-radius:20px;
+font-size:12px;
+font-weight:bold;
+display:inline-block;
+margin-bottom:10px;
+}
+
+.baixa{
+background:#d4f8d4;
+color:#128012;
+}
+
+.media{
+background:#fff1be;
+color:#a46c00;
+}
+
+.alta{
+background:#ffd9b3;
+color:#d85a00;
+}
+
+.critica{
+background:#ffd4d4;
+color:#c10000;
+}
+
+.search-box{
+display:flex;
+gap:10px;
+}
+
+.search-box input{
+flex:1;
+}
+
+footer{
+text-align:center;
+padding:30px;
+color:#777;
+}
+
+@media(max-width:768px){
+
+.form-grid{
+grid-template-columns:1fr;
+}
+
+.filters{
+grid-template-columns:1fr;
+}
+
+.historico-card{
+flex-direction:column;
+align-items:flex-start;
+gap:20px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+<div class="logo">STRATOS</div>
+
+<h1>PORTAL DE INSPEÇÃO DE EQUIPAMENTOS</h1>
+
+<p>Complexo Taquari-Vassouras</p>
+
+<div class="top-buttons">
+<button onclick="novaInspecao()">Nova Inspeção</button>
+<button onclick="document.getElementById('historico').scrollIntoView()">Histórico</button>
+<button onclick="document.getElementById('pesquisa').scrollIntoView()">Pesquisar Equipamento</button>
+</div>
+
+</header>
+
+<section class="card-section">
+
+<div class="subtitle">OPERAÇÃO EM CAMPO</div>
+<div class="title">NOVA INSPEÇÃO</div>
+<div class="description">
+Registre condições operacionais e anomalias identificadas durante a inspeção.
+</div>
+
+<form id="inspectionForm">
+
+<div class="form-grid">
+
+<div class="field">
+<label>Data</label>
+<input type="date" id="data">
+</div>
+
+<div class="field">
+<label>Hora</label>
+<input type="time" id="hora">
+</div>
+
+<div class="field">
+<label>Colaborador</label>
+<input type="text" id="colaborador">
+</div>
+
+<div class="field">
+<label>Área</label>
+<select id="area">
+<option>Britagem</option>
+<option>Moagem</option>
+<option>Peneiramento</option>
+<option>Flotação</option>
+<option>Centrifugação</option>
+<option>Secagem</option>
+<option>Compactação</option>
+<option>Externa</option>
+</select>
+</div>
+
+<div class="field">
+<label>Equipamento</label>
+<input type="text" id="equipamento">
+</div>
+
+<div class="field">
+<label>Criticidade</label>
+<select id="criticidade">
+<option>Baixa</option>
+<option>Média</option>
+<option>Alta</option>
+<option>Crítica</option>
+</select>
+</div>
+
+<div class="field full">
+<label>Anomalia Encontrada</label>
+<textarea id="anomalia"></textarea>
+</div>
+
+<div class="field full">
+<label>Foto</label>
+
+<div class="upload-box">
+<input
+type="file"
+id="foto"
+accept="image/*">
+
+<img id="preview">
+</div>
+
+</div>
+
+</div>
+
+<div class="send-area">
+<button type="submit">
+ENVIAR INSPEÇÃO
+</button>
+</div>
+
+</form>
+
+</section>
+
+<section class="card-section" id="historico">
+
+<div class="subtitle">RASTREABILIDADE OPERACIONAL</div>
+<div class="title">HISTÓRICO DE INSPEÇÕES</div>
+
+<div class="filters">
+
+<select id="filtroArea" onchange="filtrar()">
+<option value="">Todas as áreas</option>
+<option>Britagem</option>
+<option>Moagem</option>
+<option>Peneiramento</option>
+<option>Flotação</option>
+<option>Centrifugação</option>
+<option>Secagem</option>
+<option>Compactação</option>
+<option>Externa</option>
+</select>
+
+<select id="filtroCriticidade" onchange="filtrar()">
+<option value="">Todas as criticidades</option>
+<option>Baixa</option>
+<option>Média</option>
+<option>Alta</option>
+<option>Crítica</option>
+</select>
+
+<button onclick="filtrar()">
+Filtrar
+</button>
+
+<button onclick="localStorage.clear();location.reload();">
+Limpar Histórico
+</button>
+
+</div>
+
+<div id="historicoLista"></div>
+
+</section>
+
+<section class="card-section" id="pesquisa">
+
+<div class="subtitle">CONSULTA INTELIGENTE</div>
+<div class="title">PESQUISAR EQUIPAMENTO</div>
+
+<div class="search-box">
+
+<input
+type="text"
+id="busca"
+placeholder="Ex: 75RC01">
+
+<button onclick="pesquisarEquipamento()">
+Pesquisar
+</button>
+
+</div>
+
+</section>
+
+<footer>
+
+Stratos · Portal corporativo de inspeção e manutenção industrial
+
+</footer>
+
+</div>
+
+<script>
+
+let historico = [];
+
+const foto =
+document.getElementById("foto");
+
+foto.addEventListener("change",function(){
+
+const arquivo=this.files[0];
+
+if(!arquivo)return;
+
+const reader=new FileReader();
+
+reader.onload=function(e){
+
+preview.src=e.target.result;
+preview.style.display="block";
+
+}
+
+reader.readAsDataURL(arquivo);
+
+});
+
+document
+.getElementById("inspectionForm")
+.addEventListener("submit",salvarInspecao);
+
+async function salvarInspecao(e){
+
+e.preventDefault();
+
+let registro={
+
+data:data.value,
+hora:hora.value,
+colaborador:colaborador.value,
+area:area.value,
+equipamento:equipamento.value,
+criticidade:criticidade.value,
+anomalia:anomalia.value,
+foto:preview.src
+
+};
+
+await addDoc(
+collection(db,"inspecoes"),
+registro
+);
+
+alert("Inspeção salva com sucesso!");
+
+carregarHistorico();
+
+novaInspecao();
+
+}
+async function carregarHistorico(){
+
+const snapshot =
+await getDocs(
+collection(db,"inspecoes")
+);
+
+historico = [];
+
+snapshot.forEach((doc)=>{
+
+historico.push(doc.data());
+
+});
+
+atualizarHistorico();
+
+}
+function atualizarHistorico(lista = historico){
+
+const container =
+document.getElementById("historicoLista");
+
+container.innerHTML="";
+
+lista.slice().reverse().forEach((item,index)=>{
+
+let classe="baixa";
+
+if(item.criticidade==="Média")classe="media";
+if(item.criticidade==="Alta")classe="alta";
+if(item.criticidade==="Crítica")classe="critica";
+
+container.innerHTML += `
+
+<div class="historico-card"
+data-equipamento="${item.equipamento}">
+
+<div class="card-info">
+
+<img
+class="thumb"
+src="${item.foto || 'https://via.placeholder.com/80'}">
+
+<div>
+
+<div class="criticidade ${classe}">
+${item.criticidade}
+</div>
+
+<div class="card-title">
+${item.equipamento}
+</div>
+
+<p>${item.anomalia}</p>
+
+<br>
+
+<p><strong>Área:</strong> ${item.area}</p>
+<p><strong>Data:</strong> ${item.data}</p>
+<p><strong>Hora:</strong> ${item.hora}</p>
+<p><strong>Colaborador:</strong> ${item.colaborador}</p>
+
+</div>
+
+</div>
+
+<button onclick="apagar(${historico.indexOf(item)})">
+Apagar
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+function apagar(index){
+
+historico.splice(index,1);
+
+localStorage.setItem(
+"historico",
+JSON.stringify(historico)
+);
+
+atualizarHistorico();
+
+}
+
+function pesquisarEquipamento(){
+
+let busca =
+document
+.getElementById("busca")
+.value
+.toLowerCase();
+
+let resultado=
+historico.filter(item =>
+item.equipamento.toLowerCase().includes(busca)
+);
+
+atualizarHistorico(resultado);
+
+}
+
+function filtrar(){
+
+let area=
+filtroArea.value;
+
+let criticidade=
+filtroCriticidade.value;
+
+let filtrado=
+historico.filter(item =>{
+
+let areaOk=
+!area || item.area===area;
+
+let critOk=
+!criticidade ||
+item.criticidade===criticidade;
+
+return areaOk && critOk;
+
+});
+
+atualizarHistorico(filtrado);
+
+}
+
+function novaInspecao(){
+
+document
+.getElementById("inspectionForm")
+.reset();
+
+preview.style.display="none";
+preview.src="";
+
+}
+
+atualizarHistorico();
+
+</script>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+getDocs
+}
+from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA15Yn9pkU0gSk92_Y8S5G5SLfLgSBSawg",
+  authDomain: "portal-inspecao-stratos.firebaseapp.com",
+  projectId: "portal-inspecao-stratos",
+  storageBucket: "portal-inspecao-stratos.firebasestorage.app",
+  messagingSenderId: "451646182770",
+  appId: "1:451646182770:web:932a70581080f9b68639eb"
+};
+
+const app = initializeApp(firebaseConfig);
+
+window.db = getFirestore(app);
+window.collection = collection;
+window.addDoc = addDoc;
+window.getDocs = getDocs;
+
+</script>
+</body>
+</html>

@@ -470,10 +470,20 @@ colaborador:colaborador.value,
 area:area.value,
 equipamento:equipamento.value,
 criticidade:criticidade.value,
-anomalia:anomalia.value,
-foto:preview.src
+anomalia:anomalia.value
 
 };
+
+let fotosLocal =
+JSON.parse(localStorage.getItem("fotosLocal")) || {};
+
+fotosLocal[equipamento.value + "_" + data.value + "_" + hora.value] =
+preview.src;
+
+localStorage.setItem(
+"fotosLocal",
+JSON.stringify(fotosLocal)
+);
 
 await addDoc(
 collection(db,"inspecoes"),
@@ -520,6 +530,18 @@ if(item.criticidade==="Média")classe="media";
 if(item.criticidade==="Alta")classe="alta";
 if(item.criticidade==="Crítica")classe="critica";
 
+const chave =
+item.equipamento + "_" +
+item.data + "_" +
+item.hora;
+
+let fotosLocal =
+JSON.parse(localStorage.getItem("fotosLocal")) || {};
+
+const fotoHistorico =
+fotosLocal[chave] ||
+"https://via.placeholder.com/80";
+
 container.innerHTML += `
 
 <div class="historico-card"
@@ -529,8 +551,8 @@ data-equipamento="${item.equipamento}">
 
 <img
 class="thumb"
-src="https://via.placeholder.com/80">
-<div>
+
+</div>
 
 <div class="criticidade ${classe}">
 ${item.criticidade}
@@ -542,8 +564,6 @@ ${item.equipamento}
 
 <p>${item.anomalia}</p>
 
-<br>
-
 <p><strong>Área:</strong> ${item.area}</p>
 <p><strong>Data:</strong> ${item.data}</p>
 <p><strong>Hora:</strong> ${item.hora}</p>
@@ -553,7 +573,7 @@ ${item.equipamento}
 
 </div>
 
-<button onclick="apagar(${historico.indexOf(item)})">
+<button onclick="apagar(${index})">
 Apagar
 </button>
 
